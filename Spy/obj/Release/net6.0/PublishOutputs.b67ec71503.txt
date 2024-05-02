@@ -1,0 +1,12 @@
+C:\Users\Huxley\source\repos\Spy\out\Spy.exe
+C:\Users\Huxley\source\repos\Spy\out\appsettings.Development.json
+C:\Users\Huxley\source\repos\Spy\out\appsettings.json
+C:\Users\Huxley\source\repos\Spy\out\Spy.dll
+C:\Users\Huxley\source\repos\Spy\out\Spy.deps.json
+C:\Users\Huxley\source\repos\Spy\out\Spy.runtimeconfig.json
+C:\Users\Huxley\source\repos\Spy\out\Spy.pdb
+C:\Users\Huxley\source\repos\Spy\out\Microsoft.OpenApi.dll
+C:\Users\Huxley\source\repos\Spy\out\Newtonsoft.Json.dll
+C:\Users\Huxley\source\repos\Spy\out\Swashbuckle.AspNetCore.Swagger.dll
+C:\Users\Huxley\source\repos\Spy\out\Swashbuckle.AspNetCore.SwaggerGen.dll
+C:\Users\Huxley\source\repos\Spy\out\Swashbuckle.AspNetCore.SwaggerUI.dll
